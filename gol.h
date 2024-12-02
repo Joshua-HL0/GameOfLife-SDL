@@ -35,5 +35,12 @@ _DECL uint32_t BORDER_WIDTH _INIT(2);
 #define BORDER_WIDTH 2
 
 uint8_t cellArray[NUM_COLUMNS][NUM_ROWS];
+uint8_t cellArrayNext[NUM_COLUMNS][NUM_ROWS];
+
+void update_grid();
+void draw_grid(SDL_Renderer *renderer);
+void init_grid();
+void render_grid(SDL_Renderer *renderer);
+void activate_cell(SDL_Renderer *renderer, int posX, int posY);
 
 #endif
