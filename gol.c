@@ -1,9 +1,6 @@
-#include <SDL2/SDL_render.h>
-#include <string.h>
 #define VAR_DECLS 1
-#include <stdint.h>
-#include <SDL2/SDL.h>
-
+#include <string.h>
+#include <stdio.h>
 #include "gol.h"
 
 void init_grid(){
@@ -18,32 +15,35 @@ void init_grid(){
 void draw_grid(SDL_Renderer *renderer){
     SDL_SetRenderDrawColor(renderer, 0x3f, 0x3f, 0x3f, 0x3f);
 
-    for (int i = 0; i < NUM_ROWS; i++){
-        SDL_Rect border = {0, i * CELL_SIZE, WINDOW_WIDTH, BORDER_WIDTH};
+    for (int i = 0; i < NUM_COLUMNS; i++){
+        SDL_Rect border = {i * CELL_SIZE, 0, BORDER_WIDTH, WINDOW_HEIGHT};
         SDL_RenderFillRect(renderer, &border);
     }
 
-    for (int i = 0; i < NUM_COLUMNS; i++){
-        SDL_Rect border = {i * CELL_SIZE, 0, BORDER_WIDTH, WINDOW_HEIGHT};
+    for (int i = 0; i < NUM_ROWS; i++){
+        SDL_Rect border = {0, i * CELL_SIZE, WINDOW_WIDTH, BORDER_WIDTH};
         SDL_RenderFillRect(renderer, &border);
     }
 }
 
 void update_grid(){
-    for (int x = 0; x < NUM_ROWS; x++){
-        for (int y = 0; y < NUM_COLUMNS; y++){
+    for (int x = 0; x < NUM_COLUMNS; x++){
+        for (int y = 0; y < NUM_ROWS; y++){
             uint32_t neighbours = 0;
 
             for (int adjX = -1; adjX <= 1; adjX++){
-                for (int adjY = -1; adjY <= 1; adjY++){
-                    
+                for (int adjY = -1; adjY <= 1; adjY++){ 
                     if ((adjX == 0) && (adjY == 0)) continue;
-                    if (x + adjX < 0) continue;
-                    if (y + adjY < 0) continue;
-                    if (x + adjX >= NUM_ROWS) continue;
-                    if (y + adjY >= NUM_COLUMNS) continue;
 
-                    neighbours += cellArray[x + adjX][y + adjY];
+                    int tX = x + adjX;
+                    int tY = y + adjY;
+
+                    if (tX < 0) tX = NUM_COLUMNS - 1;
+                    if (tY < 0) tY = NUM_ROWS - 1;
+                    if (tX >= NUM_COLUMNS) tX = 0;
+                    if (tY >= NUM_ROWS) tY = 0;
+
+                    neighbours += cellArray[tX][tY];
                 }
             }
 
@@ -67,8 +67,8 @@ void render_grid(SDL_Renderer *renderer){
 
     SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
 
-    for (int x = 0; x < NUM_ROWS; x++){
-        for (int y = 0; y < NUM_COLUMNS; y++){
+    for (int x = 0; x < NUM_COLUMNS; x++){
+        for (int y = 0; y < NUM_ROWS; y++){
             if (cellArray[x][y]){
                 activate_cell(renderer, x, y);
             }
@@ -94,6 +94,9 @@ int main(){
     draw_grid(renderer);
     
     init_grid();
+
+    printf("Height: %d, Width: %d\nRows: %d, Columns: %d", WINDOW_HEIGHT, WINDOW_WIDTH, NUM_ROWS, NUM_COLUMNS);
+
 
     uint8_t running = 1;
     SDL_Event event;
