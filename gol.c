@@ -1,3 +1,5 @@
+#include <SDL2/SDL_events.h>
+#include <SDL2/SDL_mouse.h>
 #define VAR_DECLS 1
 #include <string.h>
 #include <stdio.h>
@@ -5,15 +7,24 @@
 
 void init_grid(){
     // glider pattern
-    cellArray[1][0] = 1;
+    /*cellArray[1][0] = 1;
     cellArray[2][1] = 1;
     cellArray[0][2] = 1;
     cellArray[1][2] = 1;
-    cellArray[2][2] = 1;
+    cellArray[2][2] = 1;*/
+
+    // random pattern
+    for (int i = 0; i < NUM_COLUMNS; i++){
+        for (int j = 0; j < NUM_ROWS; j++){
+            cellArray[i][j] = rand() % 2;
+        }
+    }
+
+
 }
 
 void draw_grid(SDL_Renderer *renderer){
-    SDL_SetRenderDrawColor(renderer, 0x3f, 0x3f, 0x3f, 0x3f);
+    SDL_SetRenderDrawColor(renderer, COLOUR_OFFWHITE);
 
     for (int i = 0; i < NUM_COLUMNS; i++){
         SDL_Rect border = {i * CELL_SIZE, 0, BORDER_WIDTH, WINDOW_HEIGHT};
@@ -65,7 +76,7 @@ void render_grid(SDL_Renderer *renderer){
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0xff);
     SDL_RenderClear(renderer);
 
-    SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
+    SDL_SetRenderDrawColor(renderer, COLOUR_WHITE);
 
     for (int x = 0; x < NUM_COLUMNS; x++){
         for (int y = 0; y < NUM_ROWS; y++){
@@ -84,6 +95,15 @@ void inline activate_cell(SDL_Renderer *renderer, int posX, int posY){          
     SDL_RenderFillRect(renderer, &cell);
 }
 
+void inline cell_click(SDL_MouseButtonEvent *e){
+    if (e->button == SDL_BUTTON_LEFT){
+        int x, y;
+        SDL_GetMouseState(&x, &y);
+        printf("Click %d, %d\n", x, y);
+        cellArray[x / CELL_SIZE][y / CELL_SIZE] = !cellArray[x / CELL_SIZE][y / CELL_SIZE];
+    }
+}
+
 int main(){
 
     SDL_Init(SDL_INIT_VIDEO);
@@ -95,19 +115,21 @@ int main(){
     
     init_grid();
 
-    printf("Height: %d, Width: %d\nRows: %d, Columns: %d", WINDOW_HEIGHT, WINDOW_WIDTH, NUM_ROWS, NUM_COLUMNS);
+    printf("Height: %d, Width: %d\nRows: %d, Columns: %d\n", WINDOW_HEIGHT, WINDOW_WIDTH, NUM_ROWS, NUM_COLUMNS);
 
 
     uint8_t running = 1;
     SDL_Event event;
     while (running){
+
+        update_grid(); // grid update has to be before click check, otherwise normal update will override click changes
+
         while (SDL_PollEvent(&event)){
-            if (event.type == SDL_QUIT){
-                running = 0;
+            switch (event.type){
+                case (SDL_QUIT):            running = 0;
+                case (SDL_MOUSEBUTTONDOWN): cell_click(&event.button);
             }
         }
-
-        update_grid();
         render_grid(renderer);
         SDL_Delay(100);
     }

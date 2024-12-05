@@ -26,13 +26,13 @@ _DECL uint32_t BORDER_WIDTH _INIT(2);
 
 #define WINDOW_WIDTH 600
 #define WINDOW_HEIGHT 400
-#define COLOUR_WHITE 0xffffffff
-#define COLOUR_OFFWHITE 0x3f3f3f3f
+#define COLOUR_WHITE 0xff, 0xff, 0xff, 0xff
+#define COLOUR_OFFWHITE 0x3f, 0x3f, 0x3f, 0x3f
 
-#define CELL_SIZE 20
+#define CELL_SIZE 10
 #define NUM_ROWS (WINDOW_HEIGHT/ CELL_SIZE)
 #define NUM_COLUMNS (WINDOW_WIDTH / CELL_SIZE)
-#define BORDER_WIDTH 2
+#define BORDER_WIDTH 1
 
 uint8_t cellArray[NUM_COLUMNS][NUM_ROWS];
 uint8_t cellArrayNext[NUM_COLUMNS][NUM_ROWS];
@@ -42,5 +42,6 @@ void draw_grid(SDL_Renderer *renderer);
 void init_grid();
 void render_grid(SDL_Renderer *renderer);
 void activate_cell(SDL_Renderer *renderer, int posX, int posY);
+void cell_click(SDL_MouseButtonEvent *e);
 
 #endif
